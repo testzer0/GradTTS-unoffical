@@ -51,7 +51,7 @@ $$ dX_t = \left(\frac{1}{2}\Sigma^{-1}(\mu - X_t) - \nabla \log p_t(X_t)\right)\
 Here  $\tilde{W_t} $ is a reverse-time Brownian motion - what's more, we can get an equation without this that has the same Forward Kolmogorov Equation (and this describes an equivalent process) [[7]](#7):
 $$ dX_t = \frac{1}{2}\left(\Sigma^{-1}(\mu - X_t) - \nabla \log p_t(X_t)\right)\beta_tdt $$
 (the  $\frac{1}{2} $ has moved outside now, so it's not quite the same as just removing the  $d\tilde{W_t} $). This means that we can convert Guassian noise back to members of whatever distribution (images, speech, and so on) we desire. How does this fit in? In Grad-TTS, first each text input is first passed through a text encoder. The latter is similar to a transformer encoder, with the difference that attention layers are now replaced with *relative attention* layers. In these, the attention is 
--  $0 $ outside a window of  $W $ on either size
+- $0$ outside a window of  $W $ on either size
 - unevenly distributed inside the window - the exact weightage is learnt, and is different across heads and across  $Q,K,V $ s.
 
 Then, a duration predictor (a simple CNN) predicts factors by which to inflate each frame of the output above. This in turn is taken to be  $\mu $ above. Further  $\Sigma = I $ is assumed for simplification. Then the reverse ODE is solved to produce the mel-spectrogram of the target audio. The one unknown in it, namely  $\nabla \log p_t(X_t) $ is predicted by a UNet [[8]](#8)-style network at each step of solving the ODE (we use Euler's method). The final mel-spectrogram is converted back to audio using a vocoder. HiFiGAN [[4]](#4) works well for this. All models contain a combined total of 14.84M trainable parameters.
@@ -59,8 +59,8 @@ Then, a duration predictor (a simple CNN) predicts factors by which to inflate e
 Acknowledgements: The text encoder uses CMUDict [[9, 10]](#9) to map words into phonemes, which are then passed through an embedding layer and a pre-net (simple CNN with Mish [[11]](#10) activations).
 ## Losses
 The loss function has three components. First, during training, we get the gold-truth alignment between text and speech using Monotonic Alignment Search (a simple Dynamic Programming algorithm, see [[3]](#3)) - this gives us the "ground truth" values that the Duration Predictor should have output for each position. This is turned into an MSE loss term:
-
 $$ d_i = \log \sum_{j=1}^F \mathbb{I}_{\{A^*(j)=i\}},\hspace{1.1em}i=1,2,\cdots,L, $$
+
 $$ \mathcal{L}_{dp} = \text{MSE}(\text{DP}(\text{sg}[\tilde{\mu}, d])) $$
 The prior or encoder loss enforces the text encoder's output after inflation by the duration predictor to be close (enough) to the actual mel-spectrogram:
 $$ \mathcal{L}_{enc} = -\sum_{j=1}^F \log \varphi(y_j;\tilde{\mu}_{A(j)}, I) $$

@@ -89,9 +89,11 @@ The graphs below show the training losses w.r.t to time
 <img src="assets/diffusion-loss.PNG" alt="Image Not Found" width="400" style="background-color:white;"/> 
 <br>
 <figcaption>Diffusion Loss</figcaption>
+<br>
 <img src="assets/prior-loss.PNG" alt="Image Not Found" width="400" style="background-color:white;"/> 
 <br>
 <figcaption>Prior/Encoder Loss</figcaption>
+<br>
 <img src="assets/duration-loss.PNG" alt="Image Not Found" width="400" style="background-color:white;"/> 
 <br>
 <figcaption>Duration Loss</figcaption>

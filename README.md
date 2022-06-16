@@ -61,7 +61,7 @@ Acknowledgements: The text encoder uses CMUDict [[9, 10]](#9) to map words into 
 The loss function has three components. First, during training, we get the gold-truth alignment between text and speech using Monotonic Alignment Search (a simple Dynamic Programming algorithm, see [[3]](#3)) - this gives us the "ground truth" values that the Duration Predictor should have output for each position. This is turned into an MSE loss term:
 $$ d_i = \log \sum_{j=1}^F \mathbb{I}_{\{A^*(j)=i\}},\hspace{1.1em}i=1,2,\cdots,L, $$
 
-(extra line just because GitHub markdown LaTeX rendering is super buggy and needs specific things like a space before ending dollar but not after first, and no consecutive full-line equations)
+(extra line just because GitHub markdown LaTeX rendering is super buggy and needs specific things like a space before ending dollar but not after the opening one, and no consecutive full-line equations, plus an empty line after the double dollar full line equation)
 $$ \mathcal{L}_{dp} = \text{MSE}(\text{DP}(\text{sg}[\tilde{\mu}, d])) $$
 
 The prior or encoder loss enforces the text encoder's output after inflation by the duration predictor to be close (enough) to the actual mel-spectrogram:
@@ -69,8 +69,10 @@ $$ \mathcal{L}_{enc} = -\sum_{j=1}^F \log \varphi(y_j;\tilde{\mu}_{A(j)}, I) $$
 
 There is also a loss term to ensure that the gradient predictions are correct. First, with  $\Sigma = I $ at  $t=T $ as we take it, the covariance matrix at time  $t $ is just  $\lambda_tI $ with
 $$ \lambda_t = 1 - \exp\left(-\int_0^t \beta_sds\right) $$
+
 and so  $X_t $ is effectively sampled from a guassian of the form  $\mathcal N(\mu_t, \lambda_tI) $, or as  $\mu_t+\sqrt{\lambda_t}\xi_t $ with  $\xi_t $ from  $\mathcal N(0,I) $. Then the gradient of the log-probability can be calculated as  $-\frac{\xi_t}{\sqrt{\lambda_t}} $. The final loss term is
 $$ \mathcal L_{diff} = \mathbb{E}_{X_0,t}\left[\lambda_t\mathbb{E}_{\xi_t}\left[\left|\left|s_\theta(X_t,\mu,t)+\frac{\xi_t}{\sqrt{\lambda_t}}\right|\right|\right]\right] $$
+
 ## Training
 The graphs below show the training losses w.r.t to time
 <figure>

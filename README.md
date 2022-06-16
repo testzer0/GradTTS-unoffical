@@ -60,7 +60,7 @@ Acknowledgements: The text encoder uses CMUDict [[9, 10]](#9) to map words into 
 ## Losses
 The loss function has three components. First, during training, we get the gold-truth alignment between text and speech using Monotonic Alignment Search (a simple Dynamic Programming algorithm, see [[3]](#3)) - this gives us the "ground truth" values that the Duration Predictor should have output for each position. This is turned into an MSE loss term:
 $$ d_i = \log \sum_{j=1}^F \mathbb{I}_{\{A^*(j)=i\}},\hspace{1.1em}i=1,2,\cdots,L, $$
-
+(extra line just because GitHub markdown LaTeX rendering is super buggy and needs specific things like a space before ending dollar but not after first, and no consecutive full-line equations)
 $$ \mathcal{L}_{dp} = \text{MSE}(\text{DP}(\text{sg}[\tilde{\mu}, d])) $$
 The prior or encoder loss enforces the text encoder's output after inflation by the duration predictor to be close (enough) to the actual mel-spectrogram:
 $$ \mathcal{L}_{enc} = -\sum_{j=1}^F \log \varphi(y_j;\tilde{\mu}_{A(j)}, I) $$

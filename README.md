@@ -72,20 +72,26 @@ $$ \lambda_t = 1 - \exp\left(-\int_0^t \beta_sds\right) $$
 
 and so  $X_t $ is effectively sampled from a guassian of the form  $\mathcal N(\mu_t, \lambda_tI) $, or as  $\mu_t+\sqrt{\lambda_t}\xi_t $ with  $\xi_t $ from  $\mathcal N(0,I) $. Then the gradient of the log-probability can be calculated as  $-\frac{\xi_t}{\sqrt{\lambda_t}} $. 
 
-The final loss term is
-$$\mathcal{L}_{diff} = \mathbb{E}_{X_0,t}\left[\lambda_t\mathbb{E}_{\xi_t}\left[\left|\left|s_\theta(X_t,\mu,t)+\frac{\xi_t}{\sqrt{\lambda_t}}\right|\right|\right]\right]$$
+The final loss term is (unfortunately, the GitHub markdown renderer is awful, so if I type out the equation, it interprets underscores following closing braces as italicization; I tried adding invisible characters after `mathbb` and `mathcal` to remedy, but the only way to do is `phantom{}` or `vphantom{}` in LaTeX, which themselves take input through curly braces; so here's an image instead)
+<figure>
+<div align="center">
+<img src="assets/ldiffusion.png" alt="Image Not Found" width="400" style="background-color:white;"/> 
+<figcaption>Formula for Diffusion Loss</figcaption>
+</div>
+</figure>
 
 ## Training
 The graphs below show the training losses w.r.t to time
 
 <figure>
-<center>
+<div align="center">
 <img src="assets/diffusion-loss.PNG" alt="Image Not Found" width="400" style="background-color:white;"/> 
 <figcaption>Diffusion Loss</figcaption>
 <img src="assets/prior-loss.PNG" alt="Image Not Found" width="400" style="background-color:white;"/> 
 <figcaption>Prior/Encoder Loss</figcaption>
 <img src="assets/duration-loss.PNG" alt="Image Not Found" width="400" style="background-color:white;"/> 
-<figcaption>Duration Loss</center></figcaption>
+<figcaption>Duration Loss</figcaption>
+</div>
 </figure>
 
 Note that the diffusion loss fluctuating a lot and apparanetly not decreasing is expected, as noted in [[1]](#1) .

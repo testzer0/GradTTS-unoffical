@@ -71,7 +71,6 @@ There is also a loss term to ensure that the gradient predictions are correct. F
 $$ \lambda_t = 1 - \exp\left(-\int_0^t \beta_sds\right) $$
 
 and so  $X_t $ is effectively sampled from a guassian of the form  $\mathcal N(\mu_t, \lambda_tI) $, or as  $\mu_t+\sqrt{\lambda_t}\xi_t $ with  $\xi_t $ from  $\mathcal N(0,I) $. Then the gradient of the log-probability can be calculated as  $-\frac{\xi_t}{\sqrt{\lambda_t}} $. The final loss term is
-
 $$ \mathcal L_{diff} = \mathbb{E}_{X_0,t}\left[\lambda_t\mathbb{E}_{\xi_t}\left[\left|\left|s_\theta(X_t,\mu,t)+\frac{\xi_t}{\sqrt{\lambda_t}}\right|\right|\right]\right] $$
 
 ## Training
@@ -85,7 +84,7 @@ The graphs below show the training losses w.r.t to time
 <img src="assets/duration-loss.PNG" alt="Image Not Found" width="400" style="background-color:white;"/> 
 <figcaption>Duration Loss</center></figcaption>
 </figure>
-Note that the diffusion loss fluctuating a lot and apparanetly not decreasing is expected, as noted in [[1]](#1).
+Note that the diffusion loss fluctuating a lot and apparanetly not decreasing is expected, as noted in [[1]](#1) .
 
 ### Note
 I originally implemented the code on Google Colab, and then ported it over to a "traditional" repository format, so some errors may have crept in, though I did run the code on my PC to verify it. If you find any bugs, I'd love to hear from you and fix it ASAP.

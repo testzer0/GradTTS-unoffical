@@ -54,7 +54,7 @@ $$dX_t = \frac{1}{2}\left(\Sigma^{-1}(\mu - X_t) - \nabla \log p_t(X_t)\right)\b
 - $0$ outside a window of $W$ on either size
 - unevenly distributed inside the window - the exact weightage is learnt, and is different across heads and across $Q,K,V$ s.
 
-Then, a duration predictor (a simple CNN) predicts factors by which to inflate each frame of the output above. This in turn is taken to be $\mu$ above; and $\Sigma = I$ is assumed for simplification. Then the reverse ODE is solved to produce the mel-spectrogram of the target audio. The one unknown in it, namely $\nabla \log p_t(X_t)$ is predicted by a UNet [[8]](#8)-style network at each step of solving the ODE (we use Euler's method). The final mel-spectrogram is converted back to audio using a vocoder. HiFiGAN [[4]](#4) works well for this. All models contain a combined total of 14.84M trainable parameters.
+Then, a duration predictor (a simple CNN) predicts factors by which to inflate each frame of the output above. This in turn is taken to be $\mu$ above, and $\Sigma = I$ is assumed for simplification. Then the reverse ODE is solved to produce the mel-spectrogram of the target audio. The one unknown in it, namely $\nabla \log p_t(X_t)$ is predicted by a UNet [[8]](#8)-style network at each step of solving the ODE (we use Euler's method). The final mel-spectrogram is converted back to audio using a vocoder. HiFiGAN [[4]](#4) works well for this. All models contain a combined total of 14.84M trainable parameters.
 
 Acknowledgements: The text encoder uses CMUDict [[9, 10]](#9) to map words into phonemes, which are then passed through an embedding layer and a pre-net (simple CNN with Mish [[11]](#10) activations).
 ## Losses
@@ -70,12 +70,13 @@ $$\mathcal L_{diff} = \mathbb{E}_{X_0,t}\left[\lambda_t\mathbb{E}_{\xi_t}\left[\
 ## Training
 The graphs below show the training losses w.r.t to time
 <figure>
+<center>
 <img src="assets/diffusion-loss.PNG" alt="Image Not Found" width="400" style="background-color:white;"/> 
-<figcaption><center>Diffusion Loss</center></figcaption>
+<figcaption>Diffusion Loss</figcaption>
 <img src="assets/prior-loss.PNG" alt="Image Not Found" width="400" style="background-color:white;"/> 
-<figcaption><center>Prior/Encoder Loss</center></figcaption>
+<figcaption>Prior/Encoder Loss</figcaption>
 <img src="assets/duration-loss.PNG" alt="Image Not Found" width="400" style="background-color:white;"/> 
-<figcaption><center>Duration Loss</center></figcaption>
+<figcaption>Duration Loss</center></figcaption>
 </figure>
 Note that the diffusion loss fluctuating a lot and apparanetly not decreasing is expected, as noted in [[1]](#1).
 

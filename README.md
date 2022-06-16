@@ -48,13 +48,13 @@ Consider a member of a distribution of "objects" (vectors), such as an image, an
 $$ dX_t = b(X_t,t)dt + a(X_t,t)dW_t $$
 where  $a,b $ are functions of  $X_t $ and  $t $. If we momentarily take  $b \equiv 0 $, we see that this corresponds to adding Guassian noise to the image over time. As a special case, if  $a \equiv 1 $ we get Brownian motion. The idea is that by slowly adding Guassian noise as above, we eventually reach a point where the original "structure" is lost and  $X_t $ may have as well been drawn from a Guassian  $\mathcal N(\mu, \Sigma) $. Here, $\mu, \Sigma$ may be calculated for a $t$ if $a,b$ are known. This represents "diffusion" of $X_t$ into noise. As it turns out, this diffusion may be solved in reverse [[6]](#6):
 $$ dX_t = \left(\frac{1}{2}\Sigma^{-1}(\mu - X_t) - \nabla \log p_t(X_t)\right)\beta_tdt + \sqrt{\beta_t}d\tilde{W_t} $$
-Here $ \tilde{W_t} $ is a reverse-time Brownian motion - what's more, we can get an equation without this that has the same Forward Kolmogorov Equation (and this describes an equivalent process) [[7]](#7):
+Here  $\tilde{W_t} $ is a reverse-time Brownian motion - what's more, we can get an equation without this that has the same Forward Kolmogorov Equation (and this describes an equivalent process) [[7]](#7):
 $$ dX_t = \frac{1}{2}\left(\Sigma^{-1}(\mu - X_t) - \nabla \log p_t(X_t)\right)\beta_tdt $$
-(the $ \frac{1}{2} $ has moved outside now, so it's not quite the same as just removing the $ d\tilde{W_t} $). This means that we can convert Guassian noise back to members of whatever distribution (images, speech, and so on) we desire. How does this fit in? In Grad-TTS, first each text input is first passed through a text encoder. The latter is similar to a transformer encoder, with the difference that attention layers are now replaced with *relative attention* layers. In these, the attention is 
-- $ 0 $ outside a window of $ W $ on either size
-- unevenly distributed inside the window - the exact weightage is learnt, and is different across heads and across $ Q,K,V $ s.
+(the  $\frac{1}{2} $ has moved outside now, so it's not quite the same as just removing the  $d\tilde{W_t} $). This means that we can convert Guassian noise back to members of whatever distribution (images, speech, and so on) we desire. How does this fit in? In Grad-TTS, first each text input is first passed through a text encoder. The latter is similar to a transformer encoder, with the difference that attention layers are now replaced with *relative attention* layers. In these, the attention is 
+- $0 $ outside a window of  $W $ on either size
+- unevenly distributed inside the window - the exact weightage is learnt, and is different across heads and across  $Q,K,V $ s.
 
-Then, a duration predictor (a simple CNN) predicts factors by which to inflate each frame of the output above. This in turn is taken to be $ \mu $ above. Further $ \Sigma = I $ is assumed for simplification. Then the reverse ODE is solved to produce the mel-spectrogram of the target audio. The one unknown in it, namely $ \nabla \log p_t(X_t) $ is predicted by a UNet [[8]](#8)-style network at each step of solving the ODE (we use Euler's method). The final mel-spectrogram is converted back to audio using a vocoder. HiFiGAN [[4]](#4) works well for this. All models contain a combined total of 14.84M trainable parameters.
+Then, a duration predictor (a simple CNN) predicts factors by which to inflate each frame of the output above. This in turn is taken to be  $\mu $ above. Further  $\Sigma = I $ is assumed for simplification. Then the reverse ODE is solved to produce the mel-spectrogram of the target audio. The one unknown in it, namely  $\nabla \log p_t(X_t) $ is predicted by a UNet [[8]](#8)-style network at each step of solving the ODE (we use Euler's method). The final mel-spectrogram is converted back to audio using a vocoder. HiFiGAN [[4]](#4) works well for this. All models contain a combined total of 14.84M trainable parameters.
 
 Acknowledgements: The text encoder uses CMUDict [[9, 10]](#9) to map words into phonemes, which are then passed through an embedding layer and a pre-net (simple CNN with Mish [[11]](#10) activations).
 ## Losses
@@ -63,9 +63,9 @@ $$ d_i = \log \sum_{j=1}^F \mathbb{I}_{\{A^*(j)=i\}},\hspace{1.1em}i=1,2,\cdots,
 $$ \mathcal{L}_{dp} = \text{MSE}(\text{DP}(\text{sg}[\tilde{\mu}, d])) $$
 The prior or encoder loss enforces the text encoder's output after inflation by the duration predictor to be close (enough) to the actual mel-spectrogram:
 $$ \mathcal{L}_{enc} = -\sum_{j=1}^F \log \varphi(y_j;\tilde{\mu}_{A(j)}, I) $$
-There is also a loss term to ensure that the gradient predictions are correct. First, with $ \Sigma = I $ at $ t=T $ as we take it, the covariance matrix at time $ t $ is just $ \lambda_tI $ with
+There is also a loss term to ensure that the gradient predictions are correct. First, with  $\Sigma = I $ at  $t=T $ as we take it, the covariance matrix at time  $t $ is just  $\lambda_tI $ with
 $$ \lambda_t = 1 - \exp\left(-\int_0^t \beta_sds\right) $$
-and so $ X_t $ is effectively sampled from a guassian of the form $ \mathcal N(\mu_t, \lambda_tI) $, or as $ \mu_t+\sqrt{\lambda_t}\xi_t $ with $ \xi_t $ from $ \mathcal N(0,I) $. Then the gradient of the log-probability can be calculated as $ -\frac{\xi_t}{\sqrt{\lambda_t}} $. The final loss term is
+and so  $X_t $ is effectively sampled from a guassian of the form  $\mathcal N(\mu_t, \lambda_tI) $, or as  $\mu_t+\sqrt{\lambda_t}\xi_t $ with  $\xi_t $ from  $\mathcal N(0,I) $. Then the gradient of the log-probability can be calculated as  $-\frac{\xi_t}{\sqrt{\lambda_t}} $. The final loss term is
 $$ \mathcal L_{diff} = \mathbb{E}_{X_0,t}\left[\lambda_t\mathbb{E}_{\xi_t}\left[\left|\left|s_\theta(X_t,\mu,t)+\frac{\xi_t}{\sqrt{\lambda_t}}\right|\right|\right]\right] $$
 ## Training
 The graphs below show the training losses w.r.t to time
